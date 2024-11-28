@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cadastro de Motoristas</title>
+  <link rel="stylesheet" href="styles.css">
+  <script type="module" src="app.js" defer></script>
+</head>
+<body>
+  <h1>Cadastro de Motoristas</h1>
+  
+  <!-- Formulário de cadastro -->
+  <form id="motoristaForm">
+    <label for="carga">Carga:</label>
+    <input type="text" id="carga" name="carga" required><br><br>
+    <label for="nome">Nome do Motorista:</label>
+    <input type="text" id="nome" name="nome" required><br><br>
+    <button type="submit" id="gravarBtn">Gravar</button>
+  </form>
+
+  <!-- Formulário de pesquisa por carga -->
+  <form id="pesquisaForm">
+    <label for="pesquisaCarga">Pesquisar por Carga:</label>
+    <input type="text" id="pesquisaCarga" name="pesquisaCarga" required>
+    <button type="submit">Pesquisar</button>
+  </form>
+
+  <div id="status"></div>
+
+  <div id="motoristasLista" class="motoristas-lista">
+    <!-- Motoristas salvos serão exibidos aqui -->
+  </div>
+</body>
+</html>
