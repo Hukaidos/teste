@@ -53,10 +53,11 @@ document.addEventListener("DOMContentLoaded", () => {
           const motoristaDiv = document.createElement("div");
           motoristaDiv.classList.add("motorista-item");
 
-          motoristaDiv.innerHTML = `
+          motoristaDiv.innerHTML =
+            `<p><strong>Nome:</strong> ${motorista.nome} - <strong>Carga:</strong> ${motorista.carga}</p>
             <p><button class="edit-btn" data-id="${motoristaId}">Editar</button> 
-            <button class="delete-btn" data-id="${motoristaId}">Excluir</button> - 
-            <strong>Nome:</strong> ${motorista.nome} - <strong>Carga:</strong> ${motorista.carga}</p>`;
+            <button class="delete-btn" data-id="${motoristaId}">Excluir</button></p>`
+            
 
           // Evento de edição
           const editButton = motoristaDiv.querySelector(".edit-btn");
