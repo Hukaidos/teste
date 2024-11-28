@@ -54,8 +54,8 @@ document.addEventListener("DOMContentLoaded", () => {
           motoristaDiv.classList.add("motorista-item");
 
           motoristaDiv.innerHTML =
-            `<p><strong>Nome:</strong> ${motorista.nome} - <strong>Carga:</strong> ${motorista.carga}</p>
-            <p><button class="edit-btn" data-id="${motoristaId}">Editar</button> 
+            `<p><strong>Nome:</strong> ${motorista.nome} - <strong>Carga:</strong> ${motorista.carga}</p>`
+            `<p><button class="edit-btn" data-id="${motoristaId}">Editar</button> 
             <button class="delete-btn" data-id="${motoristaId}">Excluir</button></p>`
             
 
