@@ -4,32 +4,350 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cadastro de Motoristas</title>
-  <link rel="stylesheet" href="styles.css">
-  <script type="module" src="app.js" defer></script>
+  <style>
+
+    body {
+      display: flex;
+      align-items: center;
+      flex-direction: column;
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background-color: #242121;
+    }
+    main{
+      background-color: #05042c;
+      padding: 0 10px;
+      margin: -15px 0;
+      border-radius: 15px;
+      height: 100vh;
+    }
+
+    h1 {
+      text-align: center;
+      color: #3498db;
+    }
+    .box1{
+      display: flex;
+      align-items: center;
+      flex-direction: column;
+      background-color: #515297;
+      padding: 10px;
+      border-radius: 10px;
+    }
+    #status {
+      display: flex;
+      align-items: center;
+      padding-left: 20px;
+      height: 30px;
+      font-size: 16px;
+    }
+
+    .error {
+      color: red;
+    }
+
+    .success {
+      color: green;
+    }
+
+    #motoristaForm {
+      display: flex;
+      align-items: center;
+      background-color: #fff;
+      width: 100%;
+      padding: 5px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      margin-bottom: 5px;
+    }
+
+    #motoristaForm input {
+      height: 10px;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    #carga{
+      width: 150px;
+    }
+    #nome{
+      width: 340px;
+    }
+
+    button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 5px 10px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    #pesquisaForm{
+      display: flex;
+      align-items: center;
+      width: 100%;
+      background-color: #fff;
+      padding: 5px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    #pesquisaForm input {
+      height: 10px;
+      padding: 8px;
+      margin-right: 5px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+
+    #pesquisaCarga{
+      width: 80px;
+    }
+
+    #motoristasLista{
+      width: 600px;
+      background-color: #515297;
+      padding: 10px 10px;
+      border-radius: 5px;
+      margin-top: -10px;
+    }
+
+    .motorista-item {
+      width: 100%;
+      background-color: #fff;
+      padding: 3px;
+      margin-bottom: 5px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .motorista-item p {
+      margin: 5px 0;
+      font-size: 0.9rem;
+    }
+
+    .delete-btn {
+      background-color: #f44336;
+      color: white;
+      padding: 5px 10px;
+      border: none;
+      border-radius: 4px;
+      margin-right: 10px;
+      cursor: pointer;
+    }
+
+    .delete-btn:hover {
+      background-color: #e53935;
+    }
+
+    /* Estilos do loading spinner */
+    .loading {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      border: 5px solid #f3f3f3; /* Light grey */
+      border-top: 5px solid #3498db; /* Blue */
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 0.3s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
 </head>
 <body>
-  <h1>Cadastro de Motoristas</h1>
-  
+  <main>
+  <h1>Cadastro de carga</h1>
+  <div class="box1">
   <!-- Formulário de cadastro -->
   <form id="motoristaForm">
-    <label for="carga">Carga:</label>
-    <input type="text" id="carga" name="carga" required><br><br>
-    <label for="nome">Nome do Motorista:</label>
-    <input type="text" id="nome" name="nome" required><br><br>
+    <div class="form">
+    <input type="text" id="carga" name="carga" required placeholder="Carga">
+    <input type="text" id="nome" name="nome" required placeholder="Nome do motorista">
     <button type="submit" id="gravarBtn">Gravar</button>
+    </div>
+    
+    
   </form>
 
   <!-- Formulário de pesquisa por carga -->
   <form id="pesquisaForm">
-    <label for="pesquisaCarga">Carga:</label>
-    <input type="text" id="pesquisaCarga" name="pesquisaCarga" required>
-    <button type="submit">Pesquisar</button>
+    <input type="text" id="pesquisaCarga" name="pesquisaCarga" required placeholder="carga">
+    <button class="pesquisaCarga" type="submit">Pesquisar</button>
+    <div id="status"></div>
   </form>
-
+  </div>
   <div id="status"></div>
+
+  
 
   <div id="motoristasLista" class="motoristas-lista">
     <!-- Motoristas salvos serão exibidos aqui -->
   </div>
+
+  <!-- Spinner de carregamento -->
+  <div class="loading" id="loadingSpinner"></div>
+  </main>
+
+  <script type="module">
+    // Importar os módulos do Firebase
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+    import { 
+      getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, getDoc, query, where 
+    } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+
+    // Configuração do Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyDRXFMkxAiYPNM0CL2QUsiELwa2fjku-sk",
+      authDomain: "expedicao-atacadao.firebaseapp.com",
+      databaseURL: "https://expedicao-atacadao-default-rtdb.firebaseio.com",
+      projectId: "expedicao-atacadao",
+      storageBucket: "expedicao-atacadao.firebasestorage.app",
+      messagingSenderId: "1012289682816",
+      appId: "1:1012289682816:web:f0ab186e941ce48ec3d565",
+      measurementId: "G-J16CQ6H6CS"
+    };
+
+    // Inicializar Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // Referências do DOM
+    const statusDiv = document.getElementById("status");
+    const form = document.getElementById("motoristaForm");
+    const motoristasLista = document.getElementById("motoristasLista");
+    const gravarBtn = document.getElementById("gravarBtn");
+    const pesquisaForm = document.getElementById("pesquisaForm");
+    const pesquisaCargaInput = document.getElementById("pesquisaCarga");
+    const loadingSpinner = document.getElementById("loadingSpinner");
+
+    // Variável para estado de edição
+    let editId = null;
+
+    // Função para exibir motoristas
+    async function mostrarMotoristas(queryFilter = null) {
+      try {
+        // Exibir o spinner enquanto carrega os motoristas
+        loadingSpinner.style.display = 'block';
+
+        const motoristasSnapshot = queryFilter 
+          ? await getDocs(queryFilter) 
+          : await getDocs(collection(db, "motoristas"));
+
+        motoristasLista.innerHTML = '';
+
+        if (motoristasSnapshot.empty) {
+          statusDiv.textContent = "Nenhum motorista encontrado.";
+          statusDiv.className = "error";
+        } else {
+          motoristasSnapshot.forEach(docSnapshot => {
+            const motorista = docSnapshot.data();
+            const motoristaId = docSnapshot.id;
+
+            const motoristaDiv = document.createElement("div");
+            motoristaDiv.classList.add("motorista-item");
+            motoristaDiv.innerHTML = `
+              <p>
+                <button class="edit-btn" data-id="${motoristaId}">Editar</button> 
+                <button class="delete-btn" data-id="${motoristaId}">Excluir</button>
+                <strong>Nome:</strong> ${motorista.nome} <strong>Carga:</strong> ${motorista.carga}
+              </p>
+            `;
+
+            // Botão de editar
+            motoristaDiv.querySelector(".edit-btn").addEventListener("click", async (e) => {
+              const idMotorista = e.target.getAttribute("data-id");
+              const motoristaRef = doc(db, "motoristas", idMotorista);
+              const motoristaDoc = await getDoc(motoristaRef);
+
+              if (motoristaDoc.exists()) {
+                const motoristaData = motoristaDoc.data();
+                document.getElementById("nome").value = motoristaData.nome;
+                document.getElementById("carga").value = motoristaData.carga;
+                editId = idMotorista;
+                gravarBtn.textContent = "Atualizar";
+              } else {
+                statusDiv.textContent = "Motorista não encontrado.";
+                statusDiv.className = "error";
+              }
+            });
+
+            // Botão de excluir
+            motoristaDiv.querySelector(".delete-btn").addEventListener("click", async (e) => {
+              const idMotorista = e.target.getAttribute("data-id");
+              await deleteDoc(doc(db, "motoristas", idMotorista));
+              statusDiv.textContent = "Motorista excluído com sucesso!";
+              statusDiv.className = "success";
+              mostrarMotoristas();
+            });
+
+            motoristasLista.appendChild(motoristaDiv);
+          });
+        }
+      } catch (error) {
+        statusDiv.textContent = `Erro ao carregar motoristas: ${error.message}`;
+        statusDiv.className = "error";
+      } finally {
+        // Ocultar o spinner após a requisição
+        loadingSpinner.style.display = 'none';
+      }
+    }
+
+    // Evento de envio do formulário
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const nome = document.getElementById("nome").value.trim();
+      const carga = document.getElementById("carga").value.trim();
+
+      try {
+        // Exibir o spinner enquanto processa o formulário
+        loadingSpinner.style.display = 'block';
+
+        if (editId) {
+          await updateDoc(doc(db, "motoristas", editId), { nome, carga });
+          gravarBtn.textContent = "Gravar";
+          editId = null;
+        } else {
+          await addDoc(collection(db, "motoristas"), { nome, carga });
+        }
+        statusDiv.textContent = "Motorista salvo com sucesso!";
+        statusDiv.className = "success";
+        form.reset();
+        mostrarMotoristas();
+      } catch (error) {
+        statusDiv.textContent = `Erro ao salvar motorista: ${error.message}`;
+        statusDiv.className = "error";
+      } finally {
+        // Ocultar o spinner após o processo
+        loadingSpinner.style.display = 'none';
+      }
+    });
+
+    // Evento de pesquisa
+    pesquisaForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const pesquisaCarga = pesquisaCargaInput.value.trim();
+      if (pesquisaCarga) {
+        const q = query(collection(db, "motoristas"), where("carga", "==", pesquisaCarga));
+        mostrarMotoristas(q);
+      } else {
+        mostrarMotoristas();
+      }
+    });
+
+    // Carregar motoristas ao inicializar
+    mostrarMotoristas();
+  </script>
 </body>
 </html>
